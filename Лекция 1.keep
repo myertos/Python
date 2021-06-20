@@ -31,19 +31,48 @@ elif year % 1 == 0:
 Необходимо написать программу, которая будет запрашивать у пользователя месяц и дату рождения и выводить соответствующий знак зодиака.
 
 1. 
-a = 30
-b = 'Август'
-if  a == 30 and b == 'Август':
-    print('знак зодиака Дева')
-else:
-    print('не правильная дата')
-2.
-a = 29
-b = 'Октябрь'
-if  a == 29 and b == 'Октябрь':
-    print('знак зодиака скорпион')
-else:
-    print('не правильная дата')
+import os
+from datetime import date
+def program():
+    Year = input("год рождения:" )
+    Month = input("месяц рождения:" )
+    Day = input("число дня рождения:" )
+    Date_of_Birth = (Day + "/" + Month + "/" + Year)
+    print('Ваша дата рождения ' + Date_of_Birth)
+    d = date.today()
+    y = d.year
+    os.system("cls")
+    age = y - int(Year)
+    print('Ваш возраст ' + str(age))
+
+    if ((int(Month)==12 and int(Day) >= 22)or(int(Month)==1 and int(Day)<= 19)):
+        Signo_Zodiacal = ("\n Козерог")
+    elif ((int(Month)==1 and int(Day) >= 20)or(int(Month)==2 and int(Day)<= 17)):
+            zodiac_sign = ("\n Водолей")
+    elif ((int(Month)==2 and int(Day) >= 18)or(int(Month)==3 and int(Day)<= 19)):
+            zodiac_sign = ("\n Рыбы")
+    elif ((int(Month)==3 and int(Day) >= 20)or(int(Month)==4 and int(Day)<= 19)):
+            zodiac_sign = ("\n Овен")
+    elif ((int(Month)==4 and int(Day) >= 20)or(int(Month)==5 and int(Day)<= 20)):
+            zodiac_sign = ("\n Телец")
+    elif ((int(Month)==5 and int(Day) >= 21)or(int(Month)==6 and int(Day)<= 20)):
+            zodiac_sign = ("\n Близнецы")
+    elif ((int(Month)==6 and int(Day) >= 21)or(int(Month)==7 and int(Day)<= 22)):
+            zodiac_sign = ("\n Рак")
+    elif ((int(Month)==7 and int(Day) >= 23)or(int(Month)==8 and int(Day)<= 22)): 
+            zodiac_sign = ("\n Лев")
+    elif ((int(Month)==8 and int(Day) >= 23)or(int(Month)==9 and int(Day)<= 22)): 
+            Signo_Zodiacal = ("\n Дева")
+    elif ((int(Month)==9 and int(Day) >= 23)or(int(Month)==10 and int(Day)<= 22)):
+            zodiac_sign = ("\n Весы")
+    elif ((int(Month)==10 and int(Day) >= 23)or(int(Month)==11 and int(Day)<= 21)): 
+            zodiac_sign = ("\n Скорпион")
+    elif ((int(Month)==11 and int(Day) >= 22)or(int(Month)==12 and int(Day)<= 21)):
+            zodiac_sign = ("\n Стрелец")
+
+    print(zodiac_sign)
+
+program()
     
 Задание 4
 Вам нужно написать программу для подбора упаковок по размерам товара. Размеры (ширина, длина, высота) хранятся в переменных (в сантиметрах):
