@@ -1,1 +1,951 @@
-Копия_блокнота_"A_B_тест_1_ipynb".ipynb
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Копия блокнота \"A/B_тест_1.ipynb\"",
+      "provenance": [],
+      "collapsed_sections": [],
+      "authorship_tag": "ABX9TyMtD5xUztVBnzmXqcxnraUx",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/DenShum/A-B-test/blob/main/%D0%9A%D0%BE%D0%BF%D0%B8%D1%8F_%D0%B1%D0%BB%D0%BE%D0%BA%D0%BD%D0%BE%D1%82%D0%B0_%22A_B_%D1%82%D0%B5%D1%81%D1%82_1_ipynb%22.ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "HAYqjC4yXOiC"
+      },
+      "source": [
+        "Составьте 5 гипотез на основе данных тестового датасета.\n",
+        "\n",
+        "● Следуйте структуре. Не критикуйте себя на этом этапе.\n",
+        "\n",
+        "● Какие гипотезы можно сразу отмести и почему?\n",
+        "\n",
+        "● Оцените гипотезы с точки зрения их привлекательности от 1 до 10.\n",
+        "\n",
+        "● Почему вы оценили их именно так? Свои рассуждения описывайте максимально \n",
+        "подробно.\n",
+        "\n",
+        "Оформите результат в виде таблицы\n",
+        "Приоритизируйте гипотезы по ICE"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_DGp51KpXHYm",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 811
+        },
+        "outputId": "b44378c9-d94b-4fc8-c1fa-243e6aa858e9"
+      },
+      "source": [
+        "import pandas as pd\n",
+        "df = pd.read_csv('/content/Netology_A_B-testing_HW_1.csv')\n",
+        "print(df.shape) #количество стр. и столб.\n",
+        "df.info()\n",
+        "# df = df.apply(pd.to_numeric,errors='coerce') #меняем тип данных на числовые\n",
+        "df.describe().T"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "(101500, 16)\n",
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 101500 entries, 0 to 101499\n",
+            "Data columns (total 16 columns):\n",
+            " #   Column             Non-Null Count   Dtype  \n",
+            "---  ------             --------------   -----  \n",
+            " 0   Unnamed: 0         101500 non-null  int64  \n",
+            " 1   date               101500 non-null  object \n",
+            " 2   user_id            101500 non-null  int64  \n",
+            " 3   hour               101500 non-null  int64  \n",
+            " 4   app_opened         101500 non-null  int64  \n",
+            " 5   price_seen         101500 non-null  int64  \n",
+            " 6   order_made         101500 non-null  int64  \n",
+            " 7   surge              91431 non-null   object \n",
+            " 8   ride_completed     101500 non-null  int64  \n",
+            " 9   user_cancelled     101500 non-null  int64  \n",
+            " 10  age                101500 non-null  int64  \n",
+            " 11  os                 101500 non-null  object \n",
+            " 12  city_center_order  101500 non-null  int64  \n",
+            " 13  order_class        101500 non-null  object \n",
+            " 14  distance           91431 non-null   float64\n",
+            " 15  rfm                101500 non-null  object \n",
+            "dtypes: float64(1), int64(10), object(5)\n",
+            "memory usage: 12.4+ MB\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>count</th>\n",
+              "      <th>mean</th>\n",
+              "      <th>std</th>\n",
+              "      <th>min</th>\n",
+              "      <th>25%</th>\n",
+              "      <th>50%</th>\n",
+              "      <th>75%</th>\n",
+              "      <th>max</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>Unnamed: 0</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>50749.500000</td>\n",
+              "      <td>29300.670499</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>25374.750000</td>\n",
+              "      <td>50749.500000</td>\n",
+              "      <td>76124.250000</td>\n",
+              "      <td>101499.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>user_id</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>549874.802207</td>\n",
+              "      <td>258600.104176</td>\n",
+              "      <td>100093.000000</td>\n",
+              "      <td>328223.000000</td>\n",
+              "      <td>548827.000000</td>\n",
+              "      <td>773051.000000</td>\n",
+              "      <td>999978.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>hour</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>11.481429</td>\n",
+              "      <td>6.917522</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>5.000000</td>\n",
+              "      <td>11.000000</td>\n",
+              "      <td>17.000000</td>\n",
+              "      <td>23.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>app_opened</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>price_seen</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>0.900798</td>\n",
+              "      <td>0.298934</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>order_made</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>0.731389</td>\n",
+              "      <td>0.443239</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>ride_completed</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>0.620365</td>\n",
+              "      <td>0.485299</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>user_cancelled</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>0.111025</td>\n",
+              "      <td>0.314164</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>age</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>40.471764</td>\n",
+              "      <td>13.536322</td>\n",
+              "      <td>18.000000</td>\n",
+              "      <td>29.000000</td>\n",
+              "      <td>40.000000</td>\n",
+              "      <td>52.000000</td>\n",
+              "      <td>69.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>city_center_order</th>\n",
+              "      <td>101500.0</td>\n",
+              "      <td>0.571675</td>\n",
+              "      <td>0.494838</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>distance</th>\n",
+              "      <td>91431.0</td>\n",
+              "      <td>5.371152</td>\n",
+              "      <td>4.118531</td>\n",
+              "      <td>0.010946</td>\n",
+              "      <td>2.438335</td>\n",
+              "      <td>4.279565</td>\n",
+              "      <td>7.129814</td>\n",
+              "      <td>40.268966</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                      count           mean  ...            75%            max\n",
+              "Unnamed: 0         101500.0   50749.500000  ...   76124.250000  101499.000000\n",
+              "user_id            101500.0  549874.802207  ...  773051.000000  999978.000000\n",
+              "hour               101500.0      11.481429  ...      17.000000      23.000000\n",
+              "app_opened         101500.0       1.000000  ...       1.000000       1.000000\n",
+              "price_seen         101500.0       0.900798  ...       1.000000       1.000000\n",
+              "order_made         101500.0       0.731389  ...       1.000000       1.000000\n",
+              "ride_completed     101500.0       0.620365  ...       1.000000       1.000000\n",
+              "user_cancelled     101500.0       0.111025  ...       0.000000       1.000000\n",
+              "age                101500.0      40.471764  ...      52.000000      69.000000\n",
+              "city_center_order  101500.0       0.571675  ...       1.000000       1.000000\n",
+              "distance            91431.0       5.371152  ...       7.129814      40.268966\n",
+              "\n",
+              "[11 rows x 8 columns]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 1
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "rWlNh5Ccb4XX"
+      },
+      "source": [
+        "df.head(10).T"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Nh6d3aapef2V",
+        "outputId": "ab079871-dab4-4d0f-a447-fccbbd6b5518"
+      },
+      "source": [
+        "df.order_made.value_counts()# уникальные значения по колонке order_made"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1    74236\n",
+              "0    27264\n",
+              "Name: order_made, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8166fW_Bunaa",
+        "outputId": "da0d2d9b-1e37-4333-bda0-661acef79cc3"
+      },
+      "source": [
+        "df.user_cancelled.value_counts()# уникальные значения по колонке user_cancelled"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0    90231\n",
+              "1    11269\n",
+              "Name: user_cancelled, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8Pd1fEJR3Xi2",
+        "outputId": "4dad46a1-df11-4230-86b2-bf92ce5fdd80"
+      },
+      "source": [
+        "df.distance.value_counts(dropna=False)# ПРОПУСКИ в кол.distance"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "NaN          10069\n",
+              "3.462966         1\n",
+              "2.594050         1\n",
+              "0.181339         1\n",
+              "5.585941         1\n",
+              "             ...  \n",
+              "3.563971         1\n",
+              "6.757418         1\n",
+              "2.545873         1\n",
+              "10.116237        1\n",
+              "14.061233        1\n",
+              "Name: distance, Length: 91432, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 28
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ppFHZ6f26bj0"
+      },
+      "source": [
+        "df['surge'] = df['surge'].fillna('no surge')# заменяем NaN на 'no surge' в кол.surge\n",
+        "df.loc[(df.distance > 0), 'order_made'] = 1 # ставим 1 в кол.'order_made', если в кол.distance есть расстояние\n",
+        "df.head(10).T # очищенный датафрейм"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ds6vzhPjDP4X",
+        "outputId": "d1df6170-dba3-4d49-a7a8-ae58ddf44958"
+      },
+      "source": [
+        "df.order_made.value_counts()# уникальные значения по колонке order_made после ИСПРАВЛЕНИЯ"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1    91431\n",
+              "0    10069\n",
+              "Name: order_made, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 43
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3FgzcI_YPamx",
+        "outputId": "d8ec5372-5a8d-4682-9c54-e0274c21c97a"
+      },
+      "source": [
+        "df.user_cancelled.value_counts()# уникальные значения по колонке user_cancelled "
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0    90231\n",
+              "1    11269\n",
+              "Name: user_cancelled, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "svqndZ-0NnOc",
+        "outputId": "d7ac6def-8452-42c8-a60b-0c9e7799de5a"
+      },
+      "source": [
+        "df1 = df[df.user_cancelled==1]# отфильтруем user_cancelled==1(отмена поездки,%, в соответствии с классом)\n",
+        "df1.order_class.value_counts(normalize=True)"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "economy     0.550981\n",
+              "comfort     0.359304\n",
+              "business    0.089715\n",
+              "Name: order_class, dtype: float64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 21
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 330
+        },
+        "id": "5eNqvdaqTuis",
+        "outputId": "86362e28-b7c2-4b45-f066-27bb7cd92f2f"
+      },
+      "source": [
+        "df1.head()# отфильтрованный по отменнам поездки датафрейм"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Unnamed: 0</th>\n",
+              "      <th>date</th>\n",
+              "      <th>user_id</th>\n",
+              "      <th>hour</th>\n",
+              "      <th>app_opened</th>\n",
+              "      <th>price_seen</th>\n",
+              "      <th>order_made</th>\n",
+              "      <th>surge</th>\n",
+              "      <th>ride_completed</th>\n",
+              "      <th>user_cancelled</th>\n",
+              "      <th>age</th>\n",
+              "      <th>os</th>\n",
+              "      <th>city_center_order</th>\n",
+              "      <th>order_class</th>\n",
+              "      <th>distance</th>\n",
+              "      <th>rfm</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>22</th>\n",
+              "      <td>22</td>\n",
+              "      <td>2020-05-21</td>\n",
+              "      <td>667749</td>\n",
+              "      <td>5</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>no surge</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>53</td>\n",
+              "      <td>Android</td>\n",
+              "      <td>1</td>\n",
+              "      <td>business</td>\n",
+              "      <td>5.612632</td>\n",
+              "      <td>medium</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>27</th>\n",
+              "      <td>27</td>\n",
+              "      <td>2020-05-21</td>\n",
+              "      <td>654038</td>\n",
+              "      <td>18</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>no surge</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>48</td>\n",
+              "      <td>Android</td>\n",
+              "      <td>0</td>\n",
+              "      <td>economy</td>\n",
+              "      <td>7.470499</td>\n",
+              "      <td>low</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>48</th>\n",
+              "      <td>48</td>\n",
+              "      <td>2020-05-23</td>\n",
+              "      <td>732720</td>\n",
+              "      <td>14</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>no surge</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>46</td>\n",
+              "      <td>Android</td>\n",
+              "      <td>0</td>\n",
+              "      <td>economy</td>\n",
+              "      <td>6.110571</td>\n",
+              "      <td>low</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>57</th>\n",
+              "      <td>57</td>\n",
+              "      <td>2020-05-21</td>\n",
+              "      <td>376141</td>\n",
+              "      <td>9</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>surge</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>32</td>\n",
+              "      <td>Android</td>\n",
+              "      <td>1</td>\n",
+              "      <td>economy</td>\n",
+              "      <td>2.640953</td>\n",
+              "      <td>low</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>79</th>\n",
+              "      <td>79</td>\n",
+              "      <td>2020-05-22</td>\n",
+              "      <td>317225</td>\n",
+              "      <td>5</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>1</td>\n",
+              "      <td>surge</td>\n",
+              "      <td>0</td>\n",
+              "      <td>1</td>\n",
+              "      <td>41</td>\n",
+              "      <td>Android</td>\n",
+              "      <td>1</td>\n",
+              "      <td>comfort</td>\n",
+              "      <td>5.642499</td>\n",
+              "      <td>high</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "    Unnamed: 0        date  user_id  ...  order_class  distance     rfm\n",
+              "22          22  2020-05-21   667749  ...     business  5.612632  medium\n",
+              "27          27  2020-05-21   654038  ...      economy  7.470499     low\n",
+              "48          48  2020-05-23   732720  ...      economy  6.110571     low\n",
+              "57          57  2020-05-21   376141  ...      economy  2.640953     low\n",
+              "79          79  2020-05-22   317225  ...      comfort  5.642499    high\n",
+              "\n",
+              "[5 rows x 16 columns]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0SdTBEuFUDuM"
+      },
+      "source": [
+        "df1.age.value_counts(ascending=True)# уникальные значения по колонке order_class в %"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "d1AaB053UlfT",
+        "outputId": "342c20f4-9a98-4b21-f1a1-0a25510f0a21"
+      },
+      "source": [
+        "df.order_class.value_counts(normalize=True)# уникальные значения по колонке order_class в %"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "economy     0.465212\n",
+              "comfort     0.416236\n",
+              "business    0.118552\n",
+              "Name: order_class, dtype: float64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 400
+        },
+        "id": "0VlQO4qkLcLE",
+        "outputId": "da51b53d-d8fd-404e-9ee7-143de454f69b"
+      },
+      "source": [
+        "df.groupby(['order_class','rfm']).count().head(10) #группировка по столбцам 'order_class'и'rfm'\n"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th>Unnamed: 0</th>\n",
+              "      <th>date</th>\n",
+              "      <th>user_id</th>\n",
+              "      <th>hour</th>\n",
+              "      <th>app_opened</th>\n",
+              "      <th>price_seen</th>\n",
+              "      <th>order_made</th>\n",
+              "      <th>surge</th>\n",
+              "      <th>ride_completed</th>\n",
+              "      <th>user_cancelled</th>\n",
+              "      <th>age</th>\n",
+              "      <th>os</th>\n",
+              "      <th>city_center_order</th>\n",
+              "      <th>distance</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>order_class</th>\n",
+              "      <th>rfm</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th rowspan=\"3\" valign=\"top\">business</th>\n",
+              "      <th>high</th>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1340</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1480</td>\n",
+              "      <td>1340</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>low</th>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5077</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5673</td>\n",
+              "      <td>5077</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>medium</th>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4378</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4880</td>\n",
+              "      <td>4378</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th rowspan=\"3\" valign=\"top\">comfort</th>\n",
+              "      <th>high</th>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>4549</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>5071</td>\n",
+              "      <td>4549</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>low</th>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>17576</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>19499</td>\n",
+              "      <td>17576</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>medium</th>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>15880</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>17678</td>\n",
+              "      <td>15880</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th rowspan=\"3\" valign=\"top\">economy</th>\n",
+              "      <th>high</th>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5002</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5612</td>\n",
+              "      <td>5002</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>low</th>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>20107</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>22192</td>\n",
+              "      <td>20107</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>medium</th>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>17522</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>19415</td>\n",
+              "      <td>17522</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                    Unnamed: 0   date  ...  city_center_order  distance\n",
+              "order_class rfm                        ...                             \n",
+              "business    high          1480   1480  ...               1480      1340\n",
+              "            low           5673   5673  ...               5673      5077\n",
+              "            medium        4880   4880  ...               4880      4378\n",
+              "comfort     high          5071   5071  ...               5071      4549\n",
+              "            low          19499  19499  ...              19499     17576\n",
+              "            medium       17678  17678  ...              17678     15880\n",
+              "economy     high          5612   5612  ...               5612      5002\n",
+              "            low          22192  22192  ...              22192     20107\n",
+              "            medium       19415  19415  ...              19415     17522\n",
+              "\n",
+              "[9 rows x 14 columns]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    }
+  ]
+} 
